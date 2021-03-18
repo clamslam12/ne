@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "express-ejs-layouts": "^2.5.0",
+    "http-status-codes": "^2.1.4"
+  },
+  "name": "ne",
+  "description": "",
+  "version": "1.0.0",
+  "main": "main.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://mddcode@github.com/mddcode/ne.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mddcode/ne/issues"
+  },
+  "homepage": "https://github.com/mddcode/ne#readme"
+}
