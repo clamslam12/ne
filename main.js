@@ -2,7 +2,8 @@ const express = require("express"),
   app = express(),
   homeController = require("./controllers/homeController"),
   layouts = require("express-ejs-layouts"),
-  errorController = require("./controllers/errorController");
+  errorController = require("./controllers/errorController"),
+  subscribersController = require("./controllers/subscribersController");
 //Using Mongoose with MongoDB
 //
 const mongoose = require("mongoose"),
@@ -48,7 +49,7 @@ var myQuery = Subscriber.find({
 }).where("email", /wexler/); //where email contains "wexler"
 
 myQuery.exec((error, data) => {
-  if (data) console.log(data);//prints an array of objects 
+  if (data) console.log(data); //prints an array of objects
 });
 
 //   //connecting to MongoDB
@@ -89,7 +90,7 @@ myQuery.exec((error, data) => {
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
 
-//middlewares
+//Middlewares; middlewares are invoked in the order they are defined
 app.use(layouts);
 app.use(express.static("public"));
 app.use(
@@ -98,14 +99,30 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(homeController.logRequestPaths);
 
 //Routers and their middlewares (their callback functions)
+//
+//runs subscribersController.getAllSubscribers middleware first, then invokes the callback middleware
+app.get(
+  "/subscribers",
+  subscribersController.getAllSubscribers,
+  (req, res, next) => {
+    //since subscribersController.getAllSubscribers stores data to req.data and calls next(),
+    //this callback middleware can retrieve data with req.data as well
+    res.render("subscribers", { subscribers: req.data }); //respond by rendering subscribers.ejs with subscribers as argument
+
+    // console.log(req.data);
+    // res.send(req.data);
+  }
+);
 app.get("/", homeController.showIndex);
 app.get("/courses", homeController.showCourses);
-app.get("/contact", homeController.showSignUp);
+app.get("/contact", subscribersController.getSubscriptionPage);
 app.post("/contact", homeController.postedSignUpForm);
+app.post("/subscribe", subscribersController.saveSubscriber);
 
-//error handling
+//error handling middlewares
 app.use(errorController.pageNotFoundError);
 app.use(errorController.internalServerError);
 

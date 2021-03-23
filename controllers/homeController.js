@@ -25,3 +25,7 @@ exports.postedSignUpForm = (req, res) => {
 exports.showIndex = (req, res) => {
   res.render("index");
 };
+exports.logRequestPaths = (req, res, next) => {
+  console.log(`request made to: ${req.url}`);
+  next();
+};
