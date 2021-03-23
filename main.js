@@ -8,6 +8,8 @@ const express = require("express"),
 //
 const mongoose = require("mongoose"),
   Subscriber = require("./models/subscriber");
+//using Promises with Mongoose
+mongoose.Promise = global.Promise;
 //initiate connection
 mongoose.connect("mongodb://localhost:27017/recipe_db", {
   useNewUrlParser: true,
@@ -52,41 +54,6 @@ myQuery.exec((error, data) => {
   if (data) console.log(data); //prints an array of objects
 });
 
-//   //connecting to MongoDB
-//
-//  const MongoDB = require("mongodb").MongoClient, //instantiate MongoClient object
-//   dbURl = "mongodb://localhost:27017", //reference to db URL
-//   dbName = "recipe_db"; //reference the database name
-
-// //connect to dbURL with a callback function
-// MongoDB.connect(dbURl, (error, client) => {
-//   if (error) {
-//     throw error;
-//   }
-//   //instantiate dbName object
-//   let db = client.db(dbName);
-//   //select a collection(table), retrieve all documents, and convert to array of documents
-//   db.collection("contacts")
-//     .find()
-//     .toArray((error, data) => {
-//       if (error) {
-//         throw error;
-//       }
-//       console.log(data);
-//     });
-//   //insert a document to a collection with a callback
-//   db.collection("contacts").insertOne(
-//     {
-//       name: "Freddie Mercury",
-//       email: "fred@queen.com",
-//     },
-//     (error, db) => {
-//       if (error) throw error;
-//       console.log(db);
-//     }
-//   );
-// });
-
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
 
@@ -104,18 +71,7 @@ app.use(homeController.logRequestPaths);
 //Routers and their middlewares (their callback functions)
 //
 //runs subscribersController.getAllSubscribers middleware first, then invokes the callback middleware
-app.get(
-  "/subscribers",
-  subscribersController.getAllSubscribers,
-  (req, res, next) => {
-    //since subscribersController.getAllSubscribers stores data to req.data and calls next(),
-    //this callback middleware can retrieve data with req.data as well
-    res.render("subscribers", { subscribers: req.data }); //respond by rendering subscribers.ejs with subscribers as argument
-
-    // console.log(req.data);
-    // res.send(req.data);
-  }
-);
+app.get("/subscribers", subscribersController.getAllSubscribers);
 app.get("/", homeController.showIndex);
 app.get("/courses", homeController.showCourses);
 app.get("/contact", subscribersController.getSubscriptionPage);
