@@ -3,13 +3,14 @@
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",
-    "http-status-codes": "^2.1.4"
+    "http-status-codes": "^2.1.4",
+    "mongodb": "^3.6.5",
+    "mongoose": "^5.12.1"
   },
   "name": "ne",
   "description": "",
   "version": "1.0.0",
   "main": "main.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
