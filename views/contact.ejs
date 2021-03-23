@@ -6,15 +6,20 @@
     <h1>Subscribe!</h1>
     <p>Enter you email if you're interested in learning more</p>
     <form class="subscription-form" action="/subscribe" method="post">
-      <input type="text" name="name" placeholder="Name" />
-      <input type="text" name="email" placeholder="Email" />
+      <label for="txtName">Name:</label>
+      <input type="text" name="name" value="" id="txtName" />
+      <label for="txtEmail">Email:</label>
+      <input type="email" name="email" value="" id="txtEmail" />
+      <label for="txtZipCode">Zip Code:</label>
       <input
         type="text"
         name="zipCode"
-        placeholder="Zip Code"
         pattern="[0-9]{5}"
+        value=""
+        id="txtZipCode"
       />
       <input type="submit" class="button" name="submit" value="Subscribe" />
     </form>
+    <p>We'll get back to you soon</p>
   </div>
 </div>
