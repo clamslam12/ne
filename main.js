@@ -1,64 +1,39 @@
+"use strict";
+
 const express = require("express"),
   app = express(),
-  homeController = require("./controllers/homeController"),
-  layouts = require("express-ejs-layouts"),
   errorController = require("./controllers/errorController"),
+  homeController = require("./controllers/homeController"),
   subscribersController = require("./controllers/subscribersController"),
+  layouts = require("express-ejs-layouts"),
   mongoose = require("mongoose"),
   Subscriber = require("./models/subscriber");
 
-//using Promises with Mongoose
 mongoose.Promise = global.Promise;
-//initiate connection
-mongoose.connect("mongodb://localhost:27017/confetti_cuisine", {
+
+mongoose.connect("mongodb://localhost:27017/recipe_db", {
   useNewUrlParser: true,
 });
 mongoose.set("useCreateIndex", true);
-//connect to db
 const db = mongoose.connection;
-//invokes callback once upon receiving an "open" event from the database
+
 db.once("open", () => {
   console.log("Successfully connected to MongoDB using Mongoose!");
 });
 
-// //2 ways of creating documents(rows) in a collection(table)
-// ///both ways are async
-// var subscriber1 = new Subscriber({
-//   name: "Minh Durbin",
-//   email: "minhdurbin@mail.com",
-// });
-// subscriber1.save((error, savedDocument) => {
-//   if (error) console.log(error);
-//   console.log("inserted using save method", savedDocument);
-// });
-// //
+var myQuery = Subscriber.findOne({
+  name: "Jon Wexler",
+}).where("email", /wexler/);
 
-// Subscriber.create(
-//   {
-//     name: "Jon Wexler",
-//     email: "jon@wexler.com",
-//   },
-//   (error, savedDocument) => {
-//     if (error) console.log(error);
-//     console.log("inserted using create method", savedDocument);
-//   }
-// );
-// //Query documents
-// //
-// var myQuery = Subscriber.find({
-//   name: "Jon Wexler",
-// }).where("email", /wexler/); //where email contains "wexler"
-
-// myQuery.exec((error, data) => {
-//   if (data) console.log(data); //prints an array of objects; if no results for query, prints empty array
-// });
+myQuery.exec((error, data) => {
+  if (data) console.log(data.name);
+});
 
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
 
-//Middlewares; middlewares are invoked in the order they are defined
-app.use(layouts);
 app.use(express.static("public"));
+app.use(layouts);
 app.use(
   express.urlencoded({
     extended: false,
@@ -67,21 +42,27 @@ app.use(
 app.use(express.json());
 app.use(homeController.logRequestPaths);
 
-//Routers and their middlewares (their callback functions)
-//
-//runs subscribersController.getAllSubscribers middleware first, then invokes the callback middleware
-app.get("/", homeController.showIndex);
-app.get("/subscribers", subscribersController.getAllSubscribers);
+app.get("/name", homeController.respondWithName);
+app.get("/items/:vegetable", homeController.sendReqParam);
+
+app.get(
+  "/subscribers",
+  subscribersController.getAllSubscribers,
+  (req, res, next) => {
+    res.render("subscribers", { subscribers: req.data });
+  }
+);
+
+app.get("/", homeController.index);
 app.get("/courses", homeController.showCourses);
+
 app.get("/contact", subscribersController.getSubscriptionPage);
 app.post("/subscribe", subscribersController.saveSubscriber);
-// app.get("/contact", homeController.showSignUp);
-// app.post("/contact", homeController.postedSignUpForm);
 
-//error handling middlewares
-app.use(errorController.pageNotFoundError);
-app.use(errorController.internalServerError);
+app.use(errorController.logErrors);
+app.use(errorController.respondNoResourceFound);
+app.use(errorController.respondInternalError);
 
 app.listen(app.get("port"), () => {
-  console.log(`Server is running on port ${app.get("port")}`);
+  console.log(`Server running at http://localhost:${app.get("port")}`);
 });

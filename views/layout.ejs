@@ -7,7 +7,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <link rel="stylesheet" href="/css/confetti_cuisine.css" />
+    <link rel="stylesheet" href="/css/recipe_app.css" />
     <!-- Bootstrap CSS -->
     <link
       rel="stylesheet"
@@ -20,15 +20,22 @@
   <body>
     <div id="nav">
       <div class="col-sm nav-align">
-        <h1>Confetti Cuisine</h1>
+        <h1 id="title">Recipe App</h1>
       </div>
       <div class="col-sm nav-align">
-        <a href="/"><span class="button">Home</span></a>
-        <a href="/courses"><span class="button">Courses</span></a>
-        <a href="/contact"><span class="button">Contact</span></a>
+        <a href="/">
+          <span class="button">Home</span>
+        </a>
+        <a href="/courses">
+          <span class="button">Cooking Courses</span>
+        </a>
+        <a href="/contact">
+          <span class="button">Contact</span>
+        </a>
       </div>
     </div>
-    <%- body %>
+    <div class="container"><%- body %></div>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script

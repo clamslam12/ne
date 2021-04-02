@@ -1,31 +1,40 @@
+"use strict";
+
 var courses = [
   {
-    title: "Rasberry Cake",
+    title: "Event Driven Cakes",
     cost: 50,
   },
   {
-    title: "Burger",
-    cost: 100,
+    title: "Asynchronous Artichoke",
+    cost: 25,
   },
   {
-    title: "Artichoke",
-    cost: 20,
+    title: "Object Oriented Orange Juice",
+    cost: 10,
   },
 ];
+
 exports.showCourses = (req, res) => {
-  res.render("courses", { offeredCourses: courses });
+  res.render("courses", {
+    offeredCourses: courses,
+  });
 };
 
-exports.showSignUp = (req, res) => {
-  res.render("contact");
-};
-exports.postedSignUpForm = (req, res) => {
-  res.render("thanks");
-};
-exports.showIndex = (req, res) => {
+exports.index = (req, res) => {
   res.render("index");
 };
+
 exports.logRequestPaths = (req, res, next) => {
   console.log(`request made to: ${req.url}`);
   next();
+};
+
+exports.sendReqParam = (req, res) => {
+  let veg = req.params.vegetable;
+  res.send(`This is the page for ${veg}`);
+};
+
+exports.respondWithName = (req, res) => {
+  res.render("index");
 };

@@ -11,7 +11,7 @@ body {
   width: 100%;
   height: 110px;
   padding: 20px 0 5px 0;
-  border-bottom: solid 8px #ee3114;
+  border-bottom: solid 8px #697acb;
   box-shadow: 10px 10px 10px #ccc;
   position: absolute;
   top: 0;
@@ -47,7 +47,7 @@ a {
 }
 
 .button {
-  background-color: #ed4a0f;
+  background-color: #3d41b4;
   padding: 0.3vw 3vw;
   border-radius: 2px;
   cursor: pointer;
@@ -56,8 +56,7 @@ a {
 }
 
 .button:hover {
-  background-color: #ffb99f;
-  color: #ed4a0f;
+  background-color: #697acb;
 }
 
 .subscriber {
@@ -71,7 +70,7 @@ a {
 
 .list-container {
   padding: 0 20px;
-  border: 3px solid #ffb568;
+  border: 3px solid #697acb;
   border-radius: 1px;
 }
 
