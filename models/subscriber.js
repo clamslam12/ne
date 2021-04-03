@@ -18,12 +18,21 @@ const subscriberSchema = new mongoose.Schema({
     min: [10000, "Zip code too short"],
     max: 99999,
   },
+  //model associations(1-to-1, 1-to-many, many-to-many)
+  //same as using foreign keys to reference another table
+  //
+  //each subscriber has an array of courses; can restrict to have one course by removing array, course: {type: mongoose.Schema.Types.ObjectId, ref: "Course"}
+
+  courses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }],
 });
 // Adding methods to Schema
 // Because the subscriber’s schema defines how instances of the Subscriber model behave, you can also add instance and static methods to the schema.
 
 // Instance methods operate on an instance (a Mongoose document) of the Subscriber model and are defined by subscriberSchema.methods
 // Static methods are used for general queries that may relate to many Subscriber instances and are defined with subscriberSchema.statics
+
+//instance methods, ex: subscriber1.get(); invoke by using lowercase Subscriber instance; 
+//static methods, ex: Subscriber.find() ; invoke by using capital Subscriber model; 
 
 //adding instance methods
 subscriberSchema.methods.getInfo = function () {

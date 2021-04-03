@@ -7,7 +7,8 @@ const express = require("express"),
   subscribersController = require("./controllers/subscribersController"),
   layouts = require("express-ejs-layouts"),
   mongoose = require("mongoose"),
-  Subscriber = require("./models/subscriber");
+  Subscriber = require("./models/subscriber"),
+  Course = require("./models/course");
 
 mongoose.Promise = global.Promise;
 
@@ -62,6 +63,36 @@ app.post("/subscribe", subscribersController.saveSubscriber);
 app.use(errorController.logErrors);
 app.use(errorController.respondNoResourceFound);
 app.use(errorController.respondInternalError);
+
+//An instance of a model is called a document.
+//Creating an instance and save to database
+// Course.create({
+//   title: "Tomato Land",
+//   description: "Locally farmed tomatoes only",
+//   zipCode: 12345,
+//   items: ["cherry", "heirlooms"],
+// }).then((course) => {
+//   console.log(course);
+//   Subscriber.findOne({}).then((subscriber) => {
+//     subscriber.courses.push(course._id); //Alternatively, you can push Course model instance,course1, into subscriber1.courses, like -> subscriber1.courses.push(course1)
+//     subscriber.save();
+//     //takes all the courses associated with the subscriber object and replaces their ObjectIds with the full Course document in the subscriber’s courses array.
+//     Subscriber.populate(subscriber, "courses").then((subscriber) => {
+//       console.log(subscriber);
+//     });
+//   });
+// });
+
+//find subscribers that are registered for a specific course w/ Subscriber.find({courses: mongoose.Types.ObjectId("5986b8aad7f31c479a983b42")}).
+Course.findOne({ title: "Tomato Land" })
+  .then((course) => {
+    return Subscriber.find({ courses: mongoose.Types.ObjectId(course._id) });
+  })
+  .then((subscribers) => {
+    subscribers.forEach((s) => {
+      console.log(s);
+    });
+  });
 
 app.listen(app.get("port"), () => {
   console.log(`Server running at http://localhost:${app.get("port")}`);
