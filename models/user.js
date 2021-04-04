@@ -1,7 +1,8 @@
 "use strict";
 
 const mongoose = require("mongoose"),
-  { Schema } = mongoose;
+  { Schema } = mongoose,
+  Subscriber = require("./subscriber");
 //trim property is set to true to make sure that no extra whitespace is saved to the database with this property
 //A new set of properties, createdAt and updatedAt, populates with dates upon the creation of a user instance and any time you change values in the model.
 //The timestamps property lets Mongoose know to include the createdAt and updatedAt values, which are useful for keeping records on how and when data changes
@@ -42,8 +43,27 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 //A virtual attribute (computed attribute) is similar to a regular schema property but isn’t saved in the database.
-userSchema.virtual("fullName").get(function() {
+userSchema.virtual("fullName").get(function () {
   return `${this.name.first} ${this.name.last}`;
 });
-
+//check for an existing subscriber with the same email address and associate the two
+//pre("save") hook runs right before a user is created or saved. It takes the next middleware function as a parameter so that when this step is complete, it can call the next middleware function
+userSchema.pre("save", function (next) {
+  if (this.subscribedAccount === undefined) {
+    Subscriber.findOne({
+      email: this.email,
+    })
+      .then((subscriber) => {
+        console.log(subscriber);
+        this.subscribedAccount = subscriber;
+        next();
+      })
+      .catch((error) => {
+        console.log(`Error in connecting to subscriber: ${error.message}`);
+        next(error);
+      });
+  } else {
+    next();
+  }
+});
 module.exports = mongoose.model("User", userSchema);

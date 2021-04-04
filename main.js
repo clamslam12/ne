@@ -2,12 +2,13 @@
 
 const express = require("express"),
   app = express(),
+  router = express.Router(),
+  layouts = require("express-ejs-layouts"),
+  mongoose = require("mongoose"),
   errorController = require("./controllers/errorController"),
   homeController = require("./controllers/homeController"),
   subscribersController = require("./controllers/subscribersController"),
   usersController = require("./controllers/usersController"),
-  layouts = require("express-ejs-layouts"),
-  mongoose = require("mongoose"),
   Subscriber = require("./models/subscriber"),
   Course = require("./models/course");
 
@@ -23,48 +24,55 @@ db.once("open", () => {
   console.log("Successfully connected to MongoDB using Mongoose!");
 });
 
-var myQuery = Subscriber.findOne({
-  name: "Jon Wexler",
-}).where("email", /wexler/);
+// var myQuery = Subscriber.findOne({
+//   name: "Jon Wexler",
+// }).where("email", /wexler/);
 
-myQuery.exec((error, data) => {
-  if (data) console.log(data.name);
-});
-
+// myQuery.exec((error, data) => {
+//   if (data) console.log(data.name);
+// });
+app.use("/", router);
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
 
-app.use(express.static("public"));
-app.use(layouts);
-app.use(
+router.use(express.static("public"));
+router.use(layouts);
+router.use(
   express.urlencoded({
     extended: false,
   })
 );
-app.use(express.json());
-app.use(homeController.logRequestPaths);
+router.use(express.json());
+router.use(homeController.logRequestPaths);
 
-app.get("/users", usersController.index, usersController.indexView); //indexView action is added the middleware function that follows the index action in your route
-app.get("/name", homeController.respondWithName);
-app.get("/items/:vegetable", homeController.sendReqParam);
+router.get("/", homeController.index);
 
-app.get(
+router.get("/users", usersController.index, usersController.indexView); //indexView action is added the middleware function that follows the index action in your route
+router.get("/users/new", usersController.new);
+router.post(
+  "/users/create",
+  usersController.create,
+  usersController.redirectView
+);
+
+router.get("/name", homeController.respondWithName);
+router.get("/items/:vegetable", homeController.sendReqParam);
+
+router.get(
   "/subscribers",
   subscribersController.getAllSubscribers,
   (req, res, next) => {
     res.render("subscribers", { subscribers: req.data });
   }
 );
+router.get("/courses", homeController.showCourses);
 
-app.get("/", homeController.index);
-app.get("/courses", homeController.showCourses);
+router.get("/contact", subscribersController.getSubscriptionPage);
+router.post("/subscribe", subscribersController.saveSubscriber);
 
-app.get("/contact", subscribersController.getSubscriptionPage);
-app.post("/subscribe", subscribersController.saveSubscriber);
-
-app.use(errorController.logErrors);
-app.use(errorController.respondNoResourceFound);
-app.use(errorController.respondInternalError);
+router.use(errorController.logErrors);
+router.use(errorController.respondNoResourceFound);
+router.use(errorController.respondInternalError);
 
 //An instance of a model is called a document.
 //Creating an instance and save to database

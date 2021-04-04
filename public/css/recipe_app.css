@@ -2,7 +2,7 @@
 
 body {
   margin: 0;
-  padding-top: 150px;
+  padding-top: 120px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #625a56;
 }
@@ -83,4 +83,13 @@ a {
 .subscription-form input {
   display: block;
   margin: 5px;
+}
+
+.data-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.data-form label {
+  margin: 5px 0 0 0;
 }
