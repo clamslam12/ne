@@ -1,44 +1,36 @@
-//for testing
 const mongoose = require("mongoose"),
   Subscriber = require("./models/subscriber"),
   Course = require("./models/course"),
   User = require("./models/user");
-
 mongoose.connect("mongodb://localhost:27017/recipe_db", {
   useNewUrlParser: true,
 });
-
 mongoose.Promise = global.Promise;
-var testCourse, testUser, testSubscriber;
-//remove all documents from Subscriber collection
+var testCourse, testUser;
 Subscriber.remove({})
-  .then((items) => {
-    console.log(`Removed ${items.n} records!`);
-  })
+  .then((items) => console.log(`Removed ${items.n} records!`))
   .then(() => {
     return Course.remove({});
   })
-  .then((items) => {
-    console.log(`Removed ${items.n} records!`);
-  })
+  .then((items) => console.log(`Removed ${items.n} records!`))
   .then(() => {
     return User.remove({});
   })
-  .then((items) => {
-    console.log(`Removed ${items.n} records!`);
-  })
+  .then((items) => console.log(`Removed ${items.n} records!`))
   .then(() => {
     return Subscriber.create({
       name: "Jon",
       email: "jon@jonwexler.com",
-      zipCode: 12345,
+      zipCode: "12345",
     });
   })
   .then((subscriber) => {
     console.log(`Created Subscriber: ${subscriber.getInfo()}`);
   })
   .then(() => {
-    return Subscriber.findOne({ name: "Jon" });
+    return Subscriber.findOne({
+      name: "Jon",
+    });
   })
   .then((subscriber) => {
     testSubscriber = subscriber;
@@ -64,9 +56,7 @@ Subscriber.remove({})
   .then(() => {
     Subscriber.populate(testSubscriber, "courses");
   })
-  .then(() => {
-    console.log(testSubscriber);
-  })
+  .then(() => console.log(testSubscriber))
   .then(() => {
     return Subscriber.find({
       courses: mongoose.Types.ObjectId(testCourse._id),
@@ -84,10 +74,6 @@ Subscriber.remove({})
   })
   .then((user) => {
     user.subscribedAccount = testSubscriber;
-    user.save().then((user) => {
-      console.log("User info:" + user);
-    });
+    user.save().then((user) => console.log("User info:" + user));
   })
-  .catch((error) => {
-    console.log(error.message);
-  });
+  .catch((error) => console.log(error.message));

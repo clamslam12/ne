@@ -42,7 +42,7 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 //A virtual attribute (computed attribute) is similar to a regular schema property but isn’t saved in the database.
-userSchema.virtual("fullName").get(() => {
+userSchema.virtual("fullName").get(function() {
   return `${this.name.first} ${this.name.last}`;
 });
 

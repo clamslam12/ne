@@ -5,6 +5,7 @@ const express = require("express"),
   errorController = require("./controllers/errorController"),
   homeController = require("./controllers/homeController"),
   subscribersController = require("./controllers/subscribersController"),
+  usersController = require("./controllers/usersController"),
   layouts = require("express-ejs-layouts"),
   mongoose = require("mongoose"),
   Subscriber = require("./models/subscriber"),
@@ -43,6 +44,7 @@ app.use(
 app.use(express.json());
 app.use(homeController.logRequestPaths);
 
+app.get("/users", usersController.index, usersController.indexView); //indexView action is added the middleware function that follows the index action in your route
 app.get("/name", homeController.respondWithName);
 app.get("/items/:vegetable", homeController.sendReqParam);
 
@@ -84,15 +86,15 @@ app.use(errorController.respondInternalError);
 // });
 
 //find subscribers that are registered for a specific course w/ Subscriber.find({courses: mongoose.Types.ObjectId("5986b8aad7f31c479a983b42")}).
-Course.findOne({ title: "Tomato Land" })
-  .then((course) => {
-    return Subscriber.find({ courses: mongoose.Types.ObjectId(course._id) });
-  })
-  .then((subscribers) => {
-    subscribers.forEach((s) => {
-      console.log(s);
-    });
-  });
+// Course.findOne({ title: "Tomato Land" })
+//   .then((course) => {
+//     return Subscriber.find({ courses: mongoose.Types.ObjectId(course._id) });
+//   })
+//   .then((subscribers) => {
+//     subscribers.forEach((s) => {
+//       console.log(s);
+//     });
+//   });
 
 app.listen(app.get("port"), () => {
   console.log(`Server running at http://localhost:${app.get("port")}`);
