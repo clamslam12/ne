@@ -46,7 +46,8 @@ const userSchema = new Schema(
 userSchema.virtual("fullName").get(function () {
   return `${this.name.first} ${this.name.last}`;
 });
-//check for an existing subscriber with the same email address and associate the two
+//Ideally, whenever a new user is created, you’d like to check for an existing subscriber with the same email address and associate the two
+//Hooks allow you to perform an operation before a database change, such as save, is run
 //pre("save") hook runs right before a user is created or saved. It takes the next middleware function as a parameter so that when this step is complete, it can call the next middleware function
 userSchema.pre("save", function (next) {
   if (this.subscribedAccount === undefined) {

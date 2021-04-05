@@ -2,6 +2,7 @@
 
 const express = require("express"),
   app = express(),
+  //creates a Router object that offers its own middleware and routing alongside the Express.js app object
   router = express.Router(),
   layouts = require("express-ejs-layouts"),
   mongoose = require("mongoose"),
@@ -31,6 +32,7 @@ db.once("open", () => {
 // myQuery.exec((error, data) => {
 //   if (data) console.log(data.name);
 // });
+
 app.use("/", router);
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
@@ -55,6 +57,12 @@ router.post(
   usersController.redirectView
 );
 
+//Different ways to pass data from client to server
+//1) pass it with url query string, ex: /?name=minh&gender=male
+//2) put data in body of request, ex: Post method in form, value of inputs are retrieved from "name" attributes; req.body.zipCode
+//3) put data in url params(req.params), ex: /users/:id
+//
+router.get("/users/:id", usersController.show, usersController.showView);
 router.get("/name", homeController.respondWithName);
 router.get("/items/:vegetable", homeController.sendReqParam);
 

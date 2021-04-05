@@ -93,3 +93,7 @@ a {
 .data-form label {
   margin: 5px 0 0 0;
 }
+
+.hidden-text {
+  -webkit-text-security: disc;
+}
