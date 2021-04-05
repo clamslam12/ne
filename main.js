@@ -6,6 +6,7 @@ const express = require("express"),
   router = express.Router(),
   layouts = require("express-ejs-layouts"),
   mongoose = require("mongoose"),
+  methodOverride = require("method-override"),
   errorController = require("./controllers/errorController"),
   homeController = require("./controllers/homeController"),
   subscribersController = require("./controllers/subscribersController"),
@@ -37,6 +38,11 @@ app.use("/", router);
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
 
+router.use(
+  methodOverride("_method", {
+    methods: ["POST", "GET"],
+  })
+);
 router.use(express.static("public"));
 router.use(layouts);
 router.use(
@@ -63,6 +69,12 @@ router.post(
 //3) put data in url params(req.params), ex: /users/:id
 //
 router.get("/users/:id", usersController.show, usersController.showView);
+router.get("/users/:id/edit", usersController.edit);
+router.put(
+  "/users/:id/update",
+  usersController.update,
+  usersController.redirectView
+);
 router.get("/name", homeController.respondWithName);
 router.get("/items/:vegetable", homeController.sendReqParam);
 

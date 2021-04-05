@@ -15,6 +15,10 @@
       </td>
       <td><%= user.email %></td>
       <td><%= user.zipCode %></td>
+      <td>
+        <a href="<%= `/users/${user._id}/edit` %>">
+        Edit</a>
+      </td>
     </tr>
     <% }); %>
   </tbody>
