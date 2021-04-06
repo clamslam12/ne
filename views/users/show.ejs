@@ -1,0 +1,31 @@
+<div class="container">
+  <h2 class="center">User Data for <%= user.fullName %></h2>
+  <table class="table">
+    <tbody>
+      <tr>
+        <td>First Name</td>
+        <td><%= user.name.first %></td>
+      </tr>
+      <tr>
+        <td>Last Name</td>
+        <td><%= user.name.last %></td>
+      </tr>
+      <tr>
+        <td>Email</td>
+        <td><%= user.email %></td>
+      </tr>
+      <tr>
+        <td>Password</td>
+        <td><%= user.password %></td>
+      </tr>
+      <tr>
+        <td>Zip code</td>
+        <td><%= user.zipCode %></td>
+      </tr>
+      <tr>
+        <td>Num of courses</td>
+        <td><%= user.courses.length %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

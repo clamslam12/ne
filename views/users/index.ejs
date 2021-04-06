@@ -1,0 +1,37 @@
+<div class="container">
+  <h2 class="center">Users Table</h2>
+  <table class="table">
+    <a href="/users/new"><span class="button">Create User</span></a>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Zip code</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% users.forEach(user => { %>
+      <tr>
+        <td>
+          <a href="<%= `/users/${user._id}` %>"> <%= user.fullName %> </a>
+        </td>
+        <td><%= user.email %></td>
+        <td><%= user.zipCode %></td>
+        <td>
+          <a href="<%= `/users/${user._id}/edit` %>"> Edit </a>
+        </td>
+        <td>
+          <a
+            href="<%= `/users/${user._id}/delete?_method=DELETE` %>"
+            onclick="return confirm('Are you sure?')"
+          >
+            Delete
+          </a>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>

@@ -85,3 +85,15 @@ a {
   display: block;
   margin: 5px;
 }
+.data-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.data-form label {
+  margin: 5px 0 0 0;
+}
+
+.hidden-text {
+  -webkit-text-security: disc;
+}

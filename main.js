@@ -1,11 +1,14 @@
 const express = require("express"),
   app = express(),
-  homeController = require("./controllers/homeController"),
+  router = express.Router(),
+  methodOverride = require("method-override"),
   layouts = require("express-ejs-layouts"),
   errorController = require("./controllers/errorController"),
   subscribersController = require("./controllers/subscribersController"),
-  mongoose = require("mongoose"),
-  Subscriber = require("./models/subscriber");
+  homeController = require("./controllers/homeController"),
+  coursesController = require("./controllers/coursesController"),
+  usersController = require("./controllers/usersController"),
+  mongoose = require("mongoose");
 
 //using Promises with Mongoose
 mongoose.Promise = global.Promise;
@@ -52,35 +55,105 @@ db.once("open", () => {
 // myQuery.exec((error, data) => {
 //   if (data) console.log(data); //prints an array of objects; if no results for query, prints empty array
 // });
-
+//
+//Middlewares; middlewares are invoked in the order they are defined
+//
+//global middlewares
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
-
-//Middlewares; middlewares are invoked in the order they are defined
-app.use(layouts);
-app.use(express.static("public"));
 app.use(
   express.urlencoded({
     extended: false,
   })
 );
-app.use(express.json());
-app.use(homeController.logRequestPaths);
+//handle all routes that starts with /
+app.use("/", router);
+
+router.use(methodOverride("_method", { methods: ["POST", "GET"] }));
+router.use(layouts);
+router.use(express.static("public"));
+router.use(express.json());
+//logs request paths
+router.use(homeController.logRequestPaths);
 
 //Routers and their middlewares (their callback functions)
-//
-//runs subscribersController.getAllSubscribers middleware first, then invokes the callback middleware
-app.get("/", homeController.showIndex);
-app.get("/subscribers", subscribersController.getAllSubscribers);
-app.get("/courses", homeController.showCourses);
-app.get("/contact", subscribersController.getSubscriptionPage);
-app.post("/subscribe", subscribersController.saveSubscriber);
-// app.get("/contact", homeController.showSignUp);
-// app.post("/contact", homeController.postedSignUpForm);
+router.get("/", homeController.index);
+
+//subscribers routers/controllers
+router.get(
+  "/subscribers",
+  subscribersController.index,
+  subscribersController.indexView
+);
+router.get("/subscribers/new", subscribersController.new);
+router.post(
+  "/subscribers/create",
+  subscribersController.create,
+  subscribersController.redirectView
+);
+router.get(
+  "/subscribers/:id",
+  subscribersController.show,
+  subscribersController.showView
+);
+router.get("/subscribers/:id/edit", subscribersController.edit);
+router.put(
+  "/subscribers/:id/update",
+  subscribersController.update,
+  subscribersController.redirectView
+);
+router.delete(
+  "/subscribers/:id/delete",
+  subscribersController.delete,
+  subscribersController.redirectView
+);
+
+//courses routers/controllers
+router.get("/courses", coursesController.index, coursesController.indexView);
+router.get("/courses/new", coursesController.new);
+router.post(
+  "/courses/create",
+  coursesController.create,
+  coursesController.redirectView
+);
+router.get("/courses/:id", coursesController.show, coursesController.showView);
+router.get("/courses/:id/edit", coursesController.edit);
+router.put(
+  "/courses/:id/update",
+  coursesController.update,
+  coursesController.redirectView
+);
+router.delete(
+  "/courses/:id/delete",
+  coursesController.delete,
+  coursesController.redirectView
+);
+
+//users routers/controllers
+router.get("/users", usersController.index, usersController.indexView);
+router.get("/users/new", usersController.new);
+router.post(
+  "/users/create",
+  usersController.create,
+  usersController.redirectView
+);
+router.get("/users/:id", usersController.show, usersController.showView);
+router.get("/users/:id/edit", usersController.edit);
+router.put(
+  "/users/:id/update",
+  usersController.update,
+  usersController.redirectView
+);
+router.delete(
+  "/users/:id/delete",
+  usersController.delete,
+  usersController.redirectView
+);
 
 //error handling middlewares
-app.use(errorController.pageNotFoundError);
-app.use(errorController.internalServerError);
+router.use(errorController.pageNotFoundError);
+router.use(errorController.internalServerError);
+
 
 app.listen(app.get("port"), () => {
   console.log(`Server is running on port ${app.get("port")}`);

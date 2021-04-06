@@ -1,0 +1,44 @@
+<div class="data-form">
+  <form class="form-signin" action="/courses/create" method="POST">
+    <h2 class="form-signin-heading">Create a new course:</h2>
+    <label for="txtTitle">Title</label>
+    <input
+      type="text"
+      name="title"
+      id="txtTitle"
+      class="form-control"
+      placeholder="Title"
+      autofocus
+    />
+    <label for="txtDescription">Description</label>
+    <input
+      type="text"
+      name="description"
+      id="txtDescription"
+      class="form-control"
+      placeholder="Description"
+    />
+    <label for="numMaxStudents">Max students</label>
+    <input
+      type="number"
+      name="maxStudents"
+      id="numMaxStudents"
+      class="form-control"
+      placeholder="Max Students"
+      required
+    />
+    <label for="numCost">Cost</label>
+    <input
+      type="number"
+      name="cost"
+      id="numCost"
+      class="form-control"
+      placeholder="Cost"
+      step="0.01"
+      required
+    />
+    <br /><button class="btn btn-lg btn-primary btn-block" type="submit">
+      Create
+    </button>
+  </form>
+</div>
