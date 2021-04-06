@@ -88,16 +88,28 @@ module.exports = {
       zipCode: req.body.zipCode,
     };
     User.findByIdAndUpdate(userID, {
-        $set: userParams
+      $set: userParams,
     })
-    .then(user=>{
+      .then((user) => {
         res.locals.reDirect = `/users/${userID}`;
         res.locals.user = user;
         next();
-    })
-    .catch(error=>{
+      })
+      .catch((error) => {
         console.log(`Error updating user by ID: ${error.message}`);
         next(error);
-    })
+      });
+  },
+  delete: (req, res, next) => {
+    let userID = req.params.id;
+    User.findByIdAndRemove(userID)
+      .then(() => {
+        res.locals.reDirect = "/users";
+        next();
+      })
+      .catch((error) => {
+        console.log(`Error deleting user by ID: ${error.message}`);
+        next();
+      });
   },
 };

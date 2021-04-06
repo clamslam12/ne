@@ -5,6 +5,8 @@
       <th>Name</th>
       <th>Email</th>
       <th>Zip Code</th>
+      <th>Edit</th>
+      <th>Delete</th>
     </tr>
   </thead>
   <tbody>
@@ -16,8 +18,15 @@
       <td><%= user.email %></td>
       <td><%= user.zipCode %></td>
       <td>
-        <a href="<%= `/users/${user._id}/edit` %>">
-        Edit</a>
+        <a href="<%= `/users/${user._id}/edit` %>"> Edit</a>
+      </td>
+      <td>
+        <a
+          href="<%= `/users/${user._id}/delete?_method=DELETE` %>"
+          onclick="return confirm('Are you sure you want to delete this record?')"
+        >
+          Delete
+        </a>
       </td>
     </tr>
     <% }); %>

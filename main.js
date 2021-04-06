@@ -75,6 +75,11 @@ router.put(
   usersController.update,
   usersController.redirectView
 );
+router.delete(
+  "/users/:id/delete",
+  usersController.delete,
+  usersController.redirectView
+);
 router.get("/name", homeController.respondWithName);
 router.get("/items/:vegetable", homeController.sendReqParam);
 
