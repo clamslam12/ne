@@ -35,6 +35,35 @@ module.exports = {
   new: (req, res) => {
     res.render("users/new");
   },
+  login: (req, res) => {
+    res.render("users/login");
+  },
+  authenticate: (req, res, next) => {
+    User.findOne({
+      email: req.body.email,
+    })
+      .then((user) => {
+        if (user && user.password === req.body.password) {
+          res.locals.redirect = `/users/${user._id}`;
+          //set var "success" to following message
+          req.flash("success", `${user.fullName}'s logged in sucessfully!`);
+          res.locals.user = user;
+          next();
+        } else {
+          //set var "error" to following message
+          req.flash(
+            "error",
+            "Your account or password is incorrect. Please try again or contact system administrator!"
+          );
+          res.locals.redirect = "/users/login";
+          next();
+        }
+      })
+      .catch((error) => {
+        console.log(`Error logging in user: ${error.message}`);
+        next(error);
+      });
+  },
   create: (req, res, next) => {
     let userParams = getUserParams(req.body);
     //add flash messages

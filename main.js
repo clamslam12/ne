@@ -1,7 +1,5 @@
 "use strict";
 
-const { resolveInclude } = require("ejs");
-
 const express = require("express"),
   app = express(),
   //creates a Router object that offers its own middleware and routing alongside the Express.js app object
@@ -20,6 +18,11 @@ const express = require("express"),
   //express-session allows you to store your messages in a few ways on the user’s browser
   //Cookies are one form of session storage, so you need the cookie-parser package to indicate that you want to use cookies
   //Cookies are small files of data sent from the server to the user’s browser, containing information about the interaction between the user and the application
+  //
+  //Why we need cookies?
+  //HTTP is a stateless protocol. Every request is processed individually and independently.
+  //Because requests are independent of one another, if one request to create a new user fails and you’re redirected to the home page, that redirect is another request, and nothing is sent in the response to the user to let them know that their attempt to create an account failed.
+  //Cookies are used to create a sense of State between multiple HTTP requests that are part of the same session
   expressSession = require("express-session"),
   cookieParser = require("cookie-parser"),
   connectFlash = require("connect-flash");
@@ -88,7 +91,14 @@ router.use(express.json());
 router.use(homeController.logRequestPaths);
 
 router.get("/", homeController.index);
-
+//Order matters: if you have two routes /users/:id and /users/login, and users/login route comes first, Express.js will match that route before checking the routes that handle parameters
+//Otherwise, Express.js will treat a request to the user's show page where login is the :id
+router.get("/users/login", usersController.login);
+router.post(
+  "/users/login",
+  usersController.authenticate,
+  usersController.redirectView
+);
 router.get("/users", usersController.index, usersController.indexView); //indexView action is added the middleware function that follows the index action in your route
 router.get("/users/new", usersController.new);
 router.post(
