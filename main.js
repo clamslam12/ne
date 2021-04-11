@@ -1,5 +1,7 @@
 "use strict";
 
+const { resolveInclude } = require("ejs");
+
 const express = require("express"),
   app = express(),
   //creates a Router object that offers its own middleware and routing alongside the Express.js app object
@@ -12,7 +14,15 @@ const express = require("express"),
   subscribersController = require("./controllers/subscribersController"),
   usersController = require("./controllers/usersController"),
   Subscriber = require("./models/subscriber"),
-  Course = require("./models/course");
+  Course = require("./models/course"),
+  //express-session module to pass messages between your application and the client
+  //These messages persist on the user’s browser but are ultimately stored in the server
+  //express-session allows you to store your messages in a few ways on the user’s browser
+  //Cookies are one form of session storage, so you need the cookie-parser package to indicate that you want to use cookies
+  //Cookies are small files of data sent from the server to the user’s browser, containing information about the interaction between the user and the application
+  expressSession = require("express-session"),
+  cookieParser = require("cookie-parser"),
+  connectFlash = require("connect-flash");
 
 mongoose.Promise = global.Promise;
 
@@ -38,6 +48,30 @@ app.use("/", router);
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
 
+///tell Express.js application to use cookie-parser as middleware and to use some secret passcode you choose to encrypt data in cookies
+router.use(cookieParser("secret_passcode"));
+//have your application use sessions by telling express-session to use cookie-parser as its storage method and to expire cookies after about an hour.
+router.use(
+  expressSession({
+    secret: "secret_passcode",
+    cookie: {
+      maxAge: 360000,
+    },
+    //don’t want to update existing session data on the server if nothing has changed in the existing session by setting resave to false
+    resave: false,
+    //don’t want to send a cookie to the user if no messages are added to the session by setting saveUninitialized to false
+    saveUninitialized: false,
+  })
+);
+//have the application use connect-flash as middleware
+router.use(connectFlash());
+//A flash message is no different from a local variable being made available to the view.
+//need to set up another middleware configuration for express to treat your connectFlash messages like a local variable on the response
+//transfer the messages from request obj to the response
+router.use((req, res, next) => {
+  res.locals.flashMessages = req.flash(); //key/value pairs
+  next();
+});
 router.use(
   methodOverride("_method", {
     methods: ["POST", "GET"],

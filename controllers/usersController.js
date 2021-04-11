@@ -1,6 +1,17 @@
 "use strict";
 
-const User = require("../models/user");
+const User = require("../models/user"),
+  getUserParams = (body) => {
+    return {
+      name: {
+        first: body.first,
+        last: body.last,
+      },
+      email: body.email,
+      password: body.password,
+      zipCode: body.zipCode,
+    };
+  };
 
 module.exports = {
   index: (req, res, next) => {
@@ -25,28 +36,27 @@ module.exports = {
     res.render("users/new");
   },
   create: (req, res, next) => {
-    let newUser = new User({
-      name: {
-        first: req.body.first,
-        last: req.body.last,
-      },
-      email: req.body.email,
-      password: req.body.password,
-      zipCode: req.body.zipCode,
-    });
-    User.create(newUser)
+    let userParams = getUserParams(req.body);
+    //add flash messages
+    User.create(userParams)
       .then((user) => {
-        res.locals.reDirect = "/users";
+        req.flash(
+          "success",
+          `${user.fullName}'s account created successfully!`
+        );
+        res.locals.redirect = "/users";
         res.locals.user = user;
         next();
       })
       .catch((error) => {
         console.log(`Error saving user: ${error.message}`);
-        next(error);
+        res.locals.redirect = "/users/new";
+        req.flash("error", `Failed to create user account: ${error.message}`);
+        next();
       });
   },
   redirectView: (req, res, next) => {
-    let redirectPath = res.locals.reDirect;
+    let redirectPath = res.locals.redirect;
     if (redirectPath) res.redirect(redirectPath);
     else next();
   },
@@ -91,7 +101,7 @@ module.exports = {
       $set: userParams,
     })
       .then((user) => {
-        res.locals.reDirect = `/users/${userID}`;
+        res.locals.redirect = `/users/${userID}`;
         res.locals.user = user;
         next();
       })

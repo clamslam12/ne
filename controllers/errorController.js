@@ -3,6 +3,9 @@
 const httpStatus = require("http-status-codes");
 
 module.exports = {
+  //if a middleware uses next(error), 
+  //logErrors and respondInternalError will be invoked in the order they were used in main.js 
+  //(in this case, logErrors first, then ,respondInternalError last)
   logErrors: (error, req, res, next) => {
     console.error(error.stack);
     next(error);
