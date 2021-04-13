@@ -1,5 +1,7 @@
 "use strict";
 
+const passport = require("passport");
+
 const User = require("../models/user"),
   getUserParams = (body) => {
     return {
@@ -38,63 +40,36 @@ module.exports = {
   login: (req, res) => {
     res.render("users/login");
   },
-  authenticate: (req, res, next) => {
-    User.findOne({
-      email: req.body.email,
-    })
-      //resolves with user object if email is found or null if not found
-      .then((user) => {
-        if (user) {
-          user.passwordComparison(req.body.password).then((passwordsMatch) => {
-            if (passwordsMatch) {
-              res.locals.redirect = `/users/${user._id}`;
-              //set var "success" to following message
-              req.flash("success", `${user.fullName}'s logged in sucessfully!`);
-              res.locals.user = user;
-            } else {
-              //set var "error" to following message
-              req.flash(
-                "error",
-                "Failed to log in user account: Incorrect Password"
-              );
-              res.locals.redirect = "/users/login";
-            }
-            next();
-          });
-        } else {
-          req.flash(
-            "error",
-            "Failed to log in user account: User account not found"
-          );
-          res.locals.redirect = "/users/login";
-          next();
-        }
-      })
-      .catch((error) => {
-        console.log(`Error logging in user: ${error.message}`);
-        next(error);
-      });
-  },
+  authenticate: passport.authenticate("local", {
+    failureRedirect: "/users/login",
+    failureFlash: "Failed to login",
+    successRedirect: "/",
+    successFlash: "Successfully logged in!",
+  }),
   create: (req, res, next) => {
     if (req.skip) return next(); //if previous validation middleware fail, then go to next middleware and dont create user
-    let userParams = getUserParams(req.body);
-    //add flash messages
-    User.create(userParams)
-      .then((user) => {
+
+    //using Passport registration in user creation
+    let newUser = new User(getUserParams(req.body));
+    //register method comes with Passport
+    User.register(newUser, req.body.password, (error, user) => {
+      //add flash messages
+      if (user) {
         req.flash(
           "success",
           `${user.fullName}'s account created successfully!`
         );
         res.locals.redirect = "/users";
-        res.locals.user = user;
         next();
-      })
-      .catch((error) => {
-        console.log(`Error saving user: ${error.message}`);
+      } else {
+        req.flash(
+          "error",
+          `Failed to create user account because: ${error.message}`
+        );
         res.locals.redirect = "/users/new";
-        req.flash("error", `Failed to create user account: ${error.message}`);
         next();
-      });
+      }
+    });
   },
   redirectView: (req, res, next) => {
     let redirectPath = res.locals.redirect;

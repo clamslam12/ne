@@ -29,7 +29,18 @@ const express = require("express"),
   //validation middleware
   //validate: check whether incoming data follows a certain format
   //sanitize: methods that modify that data to remove unwanted characters.
-  expressValidator = require("express-validator");
+  expressValidator = require("express-validator"),
+  //passport
+  passport = require("passport"),
+  User = require("./models/user");
+
+//passport serializing
+//Serialization is the process of converting data from some data structure to a compact readable format.
+//Passport.js performs the serialization process and encrypts your user’s data so that it can be stored as part of the session cookie on the client’s browser.
+//Because this cookie contains information about the user, it lets your application server know, the next time a request occurs, that this user has logged in before, which is your way of validating some-one’s state in your application
+passport.use(User.createStrategy()); //use the default local login strategy
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 mongoose.Promise = global.Promise;
 
@@ -73,6 +84,9 @@ router.use(
     saveUninitialized: false,
   })
 );
+//passport
+router.use(passport.initialize());
+router.use(passport.session()); //tells passport to use whatever sessions you've already set up with your app; comes after express-session
 //have the application use connect-flash as middleware
 router.use(connectFlash());
 //A flash message is no different from a local variable being made available to the view.
