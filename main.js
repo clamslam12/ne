@@ -25,7 +25,11 @@ const express = require("express"),
   //Cookies are used to create a sense of State between multiple HTTP requests that are part of the same session
   expressSession = require("express-session"),
   cookieParser = require("cookie-parser"),
-  connectFlash = require("connect-flash");
+  connectFlash = require("connect-flash"),
+  //validation middleware
+  //validate: check whether incoming data follows a certain format
+  //sanitize: methods that modify that data to remove unwanted characters.
+  expressValidator = require("express-validator");
 
 mongoose.Promise = global.Promise;
 
@@ -47,9 +51,12 @@ db.once("open", () => {
 //   if (data) console.log(data.name);
 // });
 
-app.use("/", router);
+// app.use("/", router);
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
+
+//tell Express.js app to use express-validator
+router.use(expressValidator());
 
 ///tell Express.js application to use cookie-parser as middleware and to use some secret passcode you choose to encrypt data in cookies
 router.use(cookieParser("secret_passcode"));
@@ -88,6 +95,7 @@ router.use(
   })
 );
 router.use(express.json());
+
 router.use(homeController.logRequestPaths);
 
 router.get("/", homeController.index);
@@ -103,6 +111,8 @@ router.get("/users", usersController.index, usersController.indexView); //indexV
 router.get("/users/new", usersController.new);
 router.post(
   "/users/create",
+  //validate middleware
+  usersController.validate,
   usersController.create,
   usersController.redirectView
 );
@@ -116,6 +126,7 @@ router.get("/users/:id", usersController.show, usersController.showView);
 router.get("/users/:id/edit", usersController.edit);
 router.put(
   "/users/:id/update",
+  usersController.validate,
   usersController.update,
   usersController.redirectView
 );
@@ -173,6 +184,7 @@ router.use(errorController.respondInternalError);
 //     });
 //   });
 
+app.use("/", router);
 app.listen(app.get("port"), () => {
   console.log(`Server running at http://localhost:${app.get("port")}`);
 });

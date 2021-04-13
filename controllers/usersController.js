@@ -76,6 +76,7 @@ module.exports = {
       });
   },
   create: (req, res, next) => {
+    if (req.skip) return next(); //if previous validation middleware fail, then go to next middleware and dont create user
     let userParams = getUserParams(req.body);
     //add flash messages
     User.create(userParams)
@@ -127,6 +128,7 @@ module.exports = {
       });
   },
   update: (req, res, next) => {
+    if (req.skip) return next(); //if previous validation middleware fail, then go to next middleware and dont create user
     let userID = req.params.id;
     let userParams = {
       name: {
@@ -161,5 +163,39 @@ module.exports = {
         console.log(`Error deleting user by ID: ${error.message}`);
         next();
       });
+  },
+  //using validation middleware instead of validation from view and model(User.find)
+  //attackers can bypass view(front-end) validation using cURL. So we need both front and server validation
+  validate: (req, res, next) => {
+    //req functions comes from express-validator
+    req
+      .sanitizeBody("email")
+      .normalizeEmail({
+        all_lowercase: true,
+      })
+      .trim();
+    req.check("email", "Email is invalid").isEmail();
+    req
+      .check("zipCode", "Zip code is invalid")
+      .notEmpty()
+      .isInt()
+      .isLength({
+        min: 5,
+        max: 5,
+      })
+      .equals(req.body.zipCode); //checks if zipCode follows the template from html
+    req.check("password", "Password cannot be empty").notEmpty();
+
+    req.getValidationResult().then((error) => {
+      if (!error.isEmpty()) {
+        let messages = error.array().map((e) => e.msg);
+        req.skip = true; //req custom property/flag
+        req.flash("error", messages.join(" and "));
+        res.locals.redirect = "/users/new";
+        next();
+      } else {
+        next();
+      }
+    });
   },
 };
