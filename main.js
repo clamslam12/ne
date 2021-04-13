@@ -92,7 +92,11 @@ router.use(connectFlash());
 //A flash message is no different from a local variable being made available to the view.
 //need to set up another middleware configuration for express to treat your connectFlash messages like a local variable on the response
 //transfer the messages from request obj to the response
+//
+//middleware will be run for every request
 router.use((req, res, next) => {
+  res.locals.loggedIn = req.isAuthenticated();
+  res.locals.currentUser = req.user;
   res.locals.flashMessages = req.flash(); //key/value pairs
   next();
 });
@@ -116,11 +120,12 @@ router.get("/", homeController.index);
 //Order matters: if you have two routes /users/:id and /users/login, and users/login route comes first, Express.js will match that route before checking the routes that handle parameters
 //Otherwise, Express.js will treat a request to the user's show page where login is the :id
 router.get("/users/login", usersController.login);
-router.post(
-  "/users/login",
-  usersController.authenticate,
+router.get(
+  "/users/logout",
+  usersController.logout,
   usersController.redirectView
 );
+router.post("/users/login", usersController.authenticate);
 router.get("/users", usersController.index, usersController.indexView); //indexView action is added the middleware function that follows the index action in your route
 router.get("/users/new", usersController.new);
 router.post(
@@ -149,6 +154,7 @@ router.delete(
   usersController.delete,
   usersController.redirectView
 );
+
 router.get("/name", homeController.respondWithName);
 router.get("/items/:vegetable", homeController.sendReqParam);
 

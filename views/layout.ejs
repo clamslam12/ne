@@ -33,6 +33,23 @@
           <span class="button">Contact</span>
         </a>
       </div>
+      <div class="login-status">
+        <% if (loggedIn) { %>
+        <div class="bubble logged-in">
+          Logged in as
+          <a href="<%=`/users/${currentUser._id}`%>">
+            <%= currentUser.fullName %></a
+          >
+        </div>
+        <div class="log-out">
+          <a href="/users/logout">Log out</a>
+        </div>
+        <%} else {%>
+        <div class="bubble log-in">
+          <a href="/users/login">Log In</a>
+        </div>
+        <% } %>
+      </div>
     </div>
 
     <div class="flashes">
@@ -42,7 +59,7 @@
       <div class="flash error"><%= flashMessages.error %></div>
       <% } %> <% } %>
     </div>
-    <br>
+    <br />
     <div class="container"><%- body %></div>
 
     <!-- Optional JavaScript -->
