@@ -9,7 +9,7 @@ const express = require("express"),
   coursesController = require("./controllers/coursesController"),
   usersController = require("./controllers/usersController"),
   mongoose = require("mongoose");
-
+//
 //using Promises with Mongoose
 mongoose.Promise = global.Promise;
 //initiate connection

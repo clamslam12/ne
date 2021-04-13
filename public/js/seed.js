@@ -62,3 +62,4 @@ Promise.all(commands)
   .catch((error) => {
     console.log(`Error: ${error}`);
   });
+  //
