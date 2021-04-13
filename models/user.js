@@ -2,7 +2,8 @@
 
 const mongoose = require("mongoose"),
   { Schema } = mongoose,
-  Subscriber = require("./subscriber");
+  Subscriber = require("./subscriber"),
+  bcrypt = require("bcrypt");
 //trim property is set to true to make sure that no extra whitespace is saved to the database with this property
 //A new set of properties, createdAt and updatedAt, populates with dates upon the creation of a user instance and any time you change values in the model.
 //The timestamps property lets Mongoose know to include the createdAt and updatedAt values, which are useful for keeping records on how and when data changes
@@ -67,4 +68,24 @@ userSchema.pre("save", function (next) {
     next();
   }
 });
+//bcrypt
+//hash the password and save into database
+userSchema.pre("save", function (next) {
+  bcrypt
+    .hash(this.password, 10)
+    //resolves with the hashed password
+    .then((hash) => {
+      //set user's password to the hash
+      this.password = hash;
+      next();
+    })
+    .catch((error) => {
+      console.log(`Error in hashing password: ${error.message}`);
+      next(error);
+    });
+});
+userSchema.methods.passwordComparison = function (inputPassword) {
+  //returns a promise with a true or false
+  return bcrypt.compare(inputPassword, this.password);
+};
 module.exports = mongoose.model("User", userSchema);

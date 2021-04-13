@@ -42,18 +42,29 @@ module.exports = {
     User.findOne({
       email: req.body.email,
     })
+      //resolves with user object if email is found or null if not found
       .then((user) => {
-        if (user && user.password === req.body.password) {
-          res.locals.redirect = `/users/${user._id}`;
-          //set var "success" to following message
-          req.flash("success", `${user.fullName}'s logged in sucessfully!`);
-          res.locals.user = user;
-          next();
+        if (user) {
+          user.passwordComparison(req.body.password).then((passwordsMatch) => {
+            if (passwordsMatch) {
+              res.locals.redirect = `/users/${user._id}`;
+              //set var "success" to following message
+              req.flash("success", `${user.fullName}'s logged in sucessfully!`);
+              res.locals.user = user;
+            } else {
+              //set var "error" to following message
+              req.flash(
+                "error",
+                "Failed to log in user account: Incorrect Password"
+              );
+              res.locals.redirect = "/users/login";
+            }
+            next();
+          });
         } else {
-          //set var "error" to following message
           req.flash(
             "error",
-            "Your account or password is incorrect. Please try again or contact system administrator!"
+            "Failed to log in user account: User account not found"
           );
           res.locals.redirect = "/users/login";
           next();
