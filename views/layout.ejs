@@ -29,7 +29,29 @@
         <a href="/users"><span class="button">Users</span></a>
       </div>
     </div>
-    <%- body %>
+    <div class="login">
+      <% if(loggedIn) { %>
+      <p>
+        Logged in as
+        <a href="<%=`/users/${currentUser._id}`%>">
+          <%= currentUser.fullName %>
+        </a>
+        <span class="log-out"><a href="/users/logout">Log out</a></span>
+      </p>
+      <% } else { %>
+      <a href="/users/login">Log in</a>
+      <% } %>
+    </div>
+    <div class="flashes">
+      <% if(flashMessages) { %> <% if(flashMessages.success) { %>
+      <div class="flash success"><%= flashMessages.success %></div>
+      <% } else if(flashMessages.error) { %>
+      <div class="flash error"><%= flashMessages.error %></div>
+      <% } %> <% } %>
+    </div>
+
+    <div class="container"><%- body %></div>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script

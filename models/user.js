@@ -5,7 +5,8 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const Subscriber = require("./subscriber");
 const Course = require("./course");
-
+const passportLocalMongoose = require("passport-local-mongoose");
+//no need password with Passport
 const userSchema = new Schema(
   {
     name: {
@@ -27,10 +28,6 @@ const userSchema = new Schema(
       type: Number,
       min: [10000, "Zip code too short"],
       max: 99999,
-    },
-    password: {
-      type: String,
-      required: true,
     },
     courses: [
       {
@@ -69,5 +66,7 @@ userSchema.pre("save", function (next) {
     next();
   }
 });
-
+userSchema.plugin(passportLocalMongoose, {
+  usernameField: "email",
+});
 module.exports = mongoose.model("User", userSchema);
