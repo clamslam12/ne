@@ -1,20 +1,16 @@
 const mongoose = require("mongoose"),
   Subscriber = require("./models/subscriber"),
-  Course = require("./models/course"),
-  User = require("./models/user");
+  Course = require("./models/course");
+var testCourse, testSubscriber;
 mongoose.connect("mongodb://localhost:27017/recipe_db", {
   useNewUrlParser: true,
 });
+mongoose.set("useCreateIndex", true);
 mongoose.Promise = global.Promise;
-var testCourse, testUser;
 Subscriber.remove({})
   .then((items) => console.log(`Removed ${items.n} records!`))
   .then(() => {
     return Course.remove({});
-  })
-  .then((items) => console.log(`Removed ${items.n} records!`))
-  .then(() => {
-    return User.remove({});
   })
   .then((items) => console.log(`Removed ${items.n} records!`))
   .then(() => {
@@ -45,35 +41,20 @@ Subscriber.remove({})
     });
   })
   .then((course) => {
-    console.log(`Created course: ${course.title}`);
     testCourse = course;
-    console.log("test:" + testCourse);
+    console.log(`Created course: ${course.title}`);
   })
   .then(() => {
     testSubscriber.courses.push(testCourse);
     testSubscriber.save();
   })
   .then(() => {
-    Subscriber.populate(testSubscriber, "courses");
+    return Subscriber.populate(testSubscriber, "courses");
   })
-  .then(() => console.log(testSubscriber))
+  .then((subscriber) => console.log(subscriber))
   .then(() => {
     return Subscriber.find({
       courses: mongoose.Types.ObjectId(testCourse._id),
     });
   })
-  .then(() => {
-    return User.create({
-      name: {
-        first: "Jon",
-        last: "Wexler",
-      },
-      email: "jon@jonwexler.com",
-      password: "pass123",
-    });
-  })
-  .then((user) => {
-    user.subscribedAccount = testSubscriber;
-    user.save().then((user) => console.log("User info:" + user));
-  })
-  .catch((error) => console.log(error.message));
+  .then((subscriber) => console.log(subscriber));

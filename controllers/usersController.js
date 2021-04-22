@@ -1,8 +1,7 @@
 "use strict";
 
-const passport = require("passport");
-
 const User = require("../models/user"),
+  passport = require("passport"),
   getUserParams = (body) => {
     return {
       name: {
@@ -17,12 +16,8 @@ const User = require("../models/user"),
 
 module.exports = {
   index: (req, res, next) => {
-    User.find({})
+    User.find()
       .then((users) => {
-        //res.locals = a unique object on the response that lets you define a variable to which you’ll have access in your view
-        //By assigning the results to res.locals.users, you won’t need to change your view; the variable name users matches locally in the view
-        //makes "users" variable available locally to whatever res is rendering; no need to do res.render('view', {var: value})
-        console.log(users);
         res.locals.users = users;
         next();
       })
@@ -37,29 +32,10 @@ module.exports = {
   new: (req, res) => {
     res.render("users/new");
   },
-  login: (req, res) => {
-    res.render("users/login");
-  },
-  logout: (req, res, next) => {
-    req.logout();
-    req.flash("success", "You have been logged out");
-    res.locals.redirect = "/";
-    next();
-  },
-  authenticate: passport.authenticate("local", {
-    failureRedirect: "/users/login",
-    failureFlash: "Failed to login",
-    successRedirect: "/",
-    successFlash: "Successfully logged in!",
-  }),
   create: (req, res, next) => {
-    if (req.skip) return next(); //if previous validation middleware fail, then go to next middleware and dont create user
-
-    //using Passport registration in user creation
+    if (req.skip) return next();
     let newUser = new User(getUserParams(req.body));
-    //register method comes with Passport
     User.register(newUser, req.body.password, (error, user) => {
-      //add flash messages
       if (user) {
         req.flash(
           "success",
@@ -70,7 +46,7 @@ module.exports = {
       } else {
         req.flash(
           "error",
-          `Failed to create user account because: ${error.message}`
+          `Failed to create user account because: ${error.message}.`
         );
         res.locals.redirect = "/users/new";
         next();
@@ -83,8 +59,8 @@ module.exports = {
     else next();
   },
   show: (req, res, next) => {
-    let userID = req.params.id;
-    User.findById(userID)
+    let userId = req.params.id;
+    User.findById(userId)
       .then((user) => {
         res.locals.user = user;
         next();
@@ -98,10 +74,12 @@ module.exports = {
     res.render("users/show");
   },
   edit: (req, res, next) => {
-    let userID = req.params.id;
-    User.findById(userID)
+    let userId = req.params.id;
+    User.findById(userId)
       .then((user) => {
-        res.render("users/edit", { user: user });
+        res.render("users/edit", {
+          user: user,
+        });
       })
       .catch((error) => {
         console.log(`Error fetching user by ID: ${error.message}`);
@@ -109,22 +87,21 @@ module.exports = {
       });
   },
   update: (req, res, next) => {
-    if (req.skip) return next(); //if previous validation middleware fail, then go to next middleware and dont create user
-    let userID = req.params.id;
-    let userParams = {
-      name: {
-        first: req.body.first,
-        last: req.body.last,
-      },
-      email: req.body.email,
-      password: req.body.password,
-      zipCode: req.body.zipCode,
-    };
-    User.findByIdAndUpdate(userID, {
+    let userId = req.params.id,
+      userParams = {
+        name: {
+          first: req.body.first,
+          last: req.body.last,
+        },
+        email: req.body.email,
+        password: req.body.password,
+        zipCode: req.body.zipCode,
+      };
+    User.findByIdAndUpdate(userId, {
       $set: userParams,
     })
       .then((user) => {
-        res.locals.redirect = `/users/${userID}`;
+        res.locals.redirect = `/users/${userId}`;
         res.locals.user = user;
         next();
       })
@@ -134,10 +111,10 @@ module.exports = {
       });
   },
   delete: (req, res, next) => {
-    let userID = req.params.id;
-    User.findByIdAndRemove(userID)
+    let userId = req.params.id;
+    User.findByIdAndRemove(userId)
       .then(() => {
-        res.locals.reDirect = "/users";
+        res.locals.redirect = "/users";
         next();
       })
       .catch((error) => {
@@ -145,10 +122,16 @@ module.exports = {
         next();
       });
   },
-  //using validation middleware instead of validation from view and model(User.find)
-  //attackers can bypass view(front-end) validation using cURL. So we need both front and server validation
+  login: (req, res) => {
+    res.render("users/login");
+  },
+  authenticate: passport.authenticate("local", {
+    failureRedirect: "/users/login",
+    failureFlash: "Failed to login.",
+    successRedirect: "/",
+    successFlash: "Logged in!",
+  }),
   validate: (req, res, next) => {
-    //req functions comes from express-validator
     req
       .sanitizeBody("email")
       .normalizeEmail({
@@ -164,13 +147,13 @@ module.exports = {
         min: 5,
         max: 5,
       })
-      .equals(req.body.zipCode); //checks if zipCode follows the template from html
+      .equals(req.body.zipCode);
     req.check("password", "Password cannot be empty").notEmpty();
 
     req.getValidationResult().then((error) => {
       if (!error.isEmpty()) {
         let messages = error.array().map((e) => e.msg);
-        req.skip = true; //req custom property/flag
+        req.skip = true;
         req.flash("error", messages.join(" and "));
         res.locals.redirect = "/users/new";
         next();
@@ -178,5 +161,11 @@ module.exports = {
         next();
       }
     });
+  },
+  logout: (req, res, next) => {
+    req.logout();
+    req.flash("success", "You have been logged out!");
+    res.locals.redirect = "/";
+    next();
   },
 };
