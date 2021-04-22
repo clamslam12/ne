@@ -15,6 +15,7 @@ module.exports = {
       });
   },
   indexView: (req, res) => {
+      //used when query string is ?format=json
     if (req.query.format === "json") {
       res.json(res.locals.courses);
     } else {
