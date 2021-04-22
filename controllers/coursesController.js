@@ -1,8 +1,29 @@
 "use strict";
 
-const Course = require("../models/course");
+const Course = require("../models/course"),
+  httpStatus = require("http-status-codes");
 
 module.exports = {
+  respondJSON: (req, res) => {
+    res.json({
+      status: httpStatus.OK,
+      data: res.locals,
+    });
+  },
+  errorJSON: (error, req, res, next) => {
+    let errorObject;
+    if (error) {
+      errorObject = {
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message,
+      };
+    } else {
+      errorObject = {
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Unknown Error.",
+      };
+    }
+  },
   index: (req, res, next) => {
     Course.find({})
       .then((courses) => {
@@ -15,12 +36,11 @@ module.exports = {
       });
   },
   indexView: (req, res) => {
-      //used when query string is ?format=json
-    if (req.query.format === "json") {
-      res.json(res.locals.courses);
-    } else {
-      res.render("courses/index");
-    }
+    // //used when query string is ?format=json
+    // if (req.query.format === "json") {
+    //   res.json(res.locals.courses);
+    // } else {res.render("courses/index");}
+    res.render("courses/index");
   },
   new: (req, res) => {
     res.render("courses/new");
