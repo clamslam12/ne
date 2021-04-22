@@ -77,6 +77,7 @@ module.exports = {
         req.flash("error", messages.join(" and "));
         req.skip = true;
         res.locals.redirect = "/users/new";
+        next();
       } else {
         next();
       }
@@ -128,7 +129,7 @@ module.exports = {
   },
   update: (req, res, next) => {
     if (req.skip) return next();
-    
+
     let userId = req.params.id;
     let updatedUser = {
       name: {
