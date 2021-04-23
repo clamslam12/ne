@@ -2,9 +2,18 @@
 
 const router = require("express").Router(),
   coursesController = require("../controllers/coursesController");
-
-//starting route /api
-router.get("/courses", coursesController.index, coursesController.respondJSON);
+//parent route is /api
+router.get(
+  "/courses/:id/join",
+  coursesController.join,
+  coursesController.respondJSON
+);
+router.get(
+  "/courses",
+  coursesController.index,
+  coursesController.filterUserCourses,
+  coursesController.respondJSON
+);
 router.use(coursesController.errorJSON);
 
 module.exports = router;

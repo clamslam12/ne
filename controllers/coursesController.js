@@ -1,29 +1,10 @@
 "use strict";
 
 const Course = require("../models/course"),
-  httpStatus = require("http-status-codes");
+  httpStatus = require("http-status-codes"),
+  User = require("../models/user");
 
 module.exports = {
-  respondJSON: (req, res) => {
-    res.json({
-      status: httpStatus.OK,
-      data: res.locals,
-    });
-  },
-  errorJSON: (error, req, res, next) => {
-    let errorObject;
-    if (error) {
-      errorObject = {
-        status: httpStatus.INTERNAL_SERVER_ERROR,
-        message: error.message,
-      };
-    } else {
-      errorObject = {
-        status: httpStatus.INTERNAL_SERVER_ERROR,
-        message: "Unknown Error.",
-      };
-    }
-  },
   index: (req, res, next) => {
     Course.find({})
       .then((courses) => {
@@ -36,10 +17,6 @@ module.exports = {
       });
   },
   indexView: (req, res) => {
-    // //used when query string is ?format=json
-    // if (req.query.format === "json") {
-    //   res.json(res.locals.courses);
-    // } else {res.render("courses/index");}
     res.render("courses/index");
   },
   new: (req, res) => {
@@ -136,5 +113,64 @@ module.exports = {
     let redirectPath = res.locals.redirect;
     if (redirectPath !== undefined) res.redirect(redirectPath);
     else next();
+  },
+  respondJSON: (req, res) => {
+    res.json({
+      status: httpStatus.OK,
+      data: res.locals,
+    });
+  },
+  errorJSON: (error, req, res, next) => {
+    let errorObject;
+    if (error) {
+      errorObject = {
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: error.message,
+      };
+    } else {
+      errorObject = {
+        status: httpStatus.INTERNAL_SERVER_ERROR,
+        message: "Unknown Error.",
+      };
+    }
+    res.json(errorObject);
+  },
+  join: (req, res, next) => {
+    let courseId = req.params.id,
+      currentUser = req.user;
+    if (currentUser) {
+      User.findByIdAndUpdate(currentUser, {
+        $addToSet: {
+          courses: courseId,
+        },
+      })
+        .then(() => {
+          res.locals.success = true;
+          next();
+        })
+        .catch((error) => {
+          next(error);
+        });
+    } else {
+      next(new Error("User must log in."));
+    }
+  },
+  //let users know whether they've already joined one or more courses in the the modal by filtering
+  filterUserCourses: (req, res, next) => {
+    let currentUser = res.locals.currentUser;
+    if (currentUser) {
+      let mappedCourses = res.locals.courses.map((course) => {
+        let userJoined = currentUser.courses.some((userCourse) => {
+          return userCourse.equals(course._id);
+        });
+        //each object in courses array has new boolean field "joined"
+        //new "joined" field not saved to database, but just added in middleware
+        return Object.assign(course.toObject(), { joined: userJoined });
+      });
+      res.locals.courses = mappedCourses;
+      next();
+    } else {
+      next();
+    }
   },
 };
