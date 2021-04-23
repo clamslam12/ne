@@ -158,11 +158,15 @@ module.exports = {
   //let users know whether they've already joined one or more courses in the the modal by filtering
   filterUserCourses: (req, res, next) => {
     let currentUser = res.locals.currentUser;
+    //checking whether a user is logged in before you continue
     if (currentUser) {
+      //If a user is logged in, use the map function on your array of courses.
       let mappedCourses = res.locals.courses.map((course) => {
+        //look at each course and check whether its _id is found in your logged-in user’s array of courses.
         let userJoined = currentUser.courses.some((userCourse) => {
           return userCourse.equals(course._id);
         });
+        //convert the course Mongoose document object to JSON so that you can append an additional property by using Object.assign
         //each object in courses array has new boolean field "joined"
         //new "joined" field not saved to database, but just added in middleware
         return Object.assign(course.toObject(), { joined: userJoined });
