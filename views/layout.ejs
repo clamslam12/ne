@@ -5,13 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+      content="width=device-width, initial-scale=0.8, maximum-scale=1"
     />
+    <title>Confetti Cuisine</title>
     <script type="text/javascript" src="/js/jquery.min.js"></script>
     <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/confettiCuisine.js"></script>
     <link rel="stylesheet" href="/css/bootstrap.css" />
     <link rel="stylesheet" href="/css/confetti_cuisine.css" />
-    <title>Confetti Cuisine</title>
   </head>
   <body>
     <div id="nav">
@@ -23,6 +24,7 @@
         <a href="/courses"><span class="button">Courses</span></a>
         <a href="/subscribers/new"><span class="button">Contact</span></a>
         <a href="/users"><span class="button">Users</span></a>
+        <%- include('courses/_coursesModal') %>
       </div>
     </div>
     <div class="login">
@@ -39,14 +41,22 @@
       <% } %>
     </div>
     <div class="flashes">
-      <% if(flashMessages) { %> <% if(flashMessages.success) { %>
-      <div class="flash success"><%= flashMessages.success %></div>
+      <% if(flashMessages) { %> 
+        <% if(flashMessages.success) { %>
+          <div class="flash success">
+            <%= flashMessages.success %>
+          </div>
       <% } else if(flashMessages.error) { %>
-      <div class="flash error"><%= flashMessages.error %></div>
-      <% } %> <% } %>
+          <div class="flash error">
+            <%= flashMessages.error %>
+          </div>
+        <% } %> 
+    <% } %>
     </div>
 
-    <div class="container"><%- body %></div>
+    <div class="container">
+      <%- body %>
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

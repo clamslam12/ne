@@ -25,43 +25,10 @@ const db = mongoose.connection;
 db.once("open", () => {
   console.log("Successfully connected to MongoDB using Mongoose!");
 });
-
-// //2 ways of creating documents(rows) in a collection(table)
-// ///both ways are async
-// var subscriber1 = new Subscriber({
-//   name: "Minh Durbin",
-//   email: "minhdurbin@mail.com",
-// });
-// subscriber1.save((error, savedDocument) => {
-//   if (error) console.log(error);
-//   console.log("inserted using save method", savedDocument);
-// });
-// //
-
-// Subscriber.create(
-//   {
-//     name: "Jon Wexler",
-//     email: "jon@wexler.com",
-//   },
-//   (error, savedDocument) => {
-//     if (error) console.log(error);
-//     console.log("inserted using create method", savedDocument);
-//   }
-// );
-// //Query documents
-// //
-// var myQuery = Subscriber.find({
-//   name: "Jon Wexler",
-// }).where("email", /wexler/); //where email contains "wexler"
-
-// myQuery.exec((error, data) => {
-//   if (data) console.log(data); //prints an array of objects; if no results for query, prints empty array
-// });
-//
 //
 //Middlewares; middlewares are invoked in the order they are defined
 //
-//global middlewares
+//app.use is global middlewares; invoked on every request
 app.set("port", process.env.PORT || 3000);
 app.set("view engine", "ejs");
 app.use(
@@ -81,7 +48,7 @@ app.use(
   expressSession({
     secret: "my_passcode",
     cookie: {
-      maxAge: 360000,
+      maxAge: 4000000,
     },
     resave: false,
     saveUninitialized: false,
