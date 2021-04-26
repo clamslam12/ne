@@ -3,18 +3,14 @@ const express = require("express"),
   router = require("./routes/index"),
   methodOverride = require("method-override"),
   layouts = require("express-ejs-layouts"),
-  errorController = require("./controllers/errorController"),
-  subscribersController = require("./controllers/subscribersController"),
-  homeController = require("./controllers/homeController"),
-  coursesController = require("./controllers/coursesController"),
-  usersController = require("./controllers/usersController"),
   mongoose = require("mongoose"),
   passport = require("passport"),
   cookieParser = require("cookie-parser"),
   expressSession = require("express-session"),
   expressValidator = require("express-validator"),
   connectFlash = require("connect-flash"),
-  User = require("./models/user");
+  User = require("./models/user"),
+  homeController = require("./controllers/homeController");
 //
 //using Promises with Mongoose
 mongoose.Promise = global.Promise;
@@ -74,14 +70,14 @@ app.use(
   })
 );
 
-router.use(methodOverride("_method", { methods: ["POST", "GET"] }));
-router.use(layouts);
-router.use(express.static("public"));
-router.use(express.json());
+app.use(methodOverride("_method", { methods: ["POST", "GET"] }));
+app.use(layouts);
+app.use(express.static("public"));
+app.use(express.json());
 
 //use sessions through cookies setup
-router.use(cookieParser("my_passcode"));
-router.use(
+app.use(cookieParser("my_passcode"));
+app.use(
   expressSession({
     secret: "my_passcode",
     cookie: {
@@ -92,26 +88,27 @@ router.use(
   })
 );
 //express validator setup
-router.use(expressValidator());
+app.use(expressValidator());
 
 //conect-flash setup
-router.use(connectFlash());
+app.use(connectFlash());
 
 //passport setup
-router.use(passport.initialize());
-router.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 passport.use(User.createStrategy());
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 //save flash messages from req.flash(), set loggedIn flag/var, and set current user
-router.use((req, res, next) => {
+app.use((req, res, next) => {
   res.locals.flashMessages = req.flash(); //key/value pairs
   res.locals.loggedIn = req.isAuthenticated();
   res.locals.currentUser = req.user;
   next();
 });
 
+app.use(homeController.logRequestPaths);
 //handle all routes that starts with /
 app.use("/", router);
 
