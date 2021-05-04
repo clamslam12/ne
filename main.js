@@ -19,10 +19,13 @@ const express = require("express"),
   User = require("./models/user");
 
 mongoose.Promise = global.Promise;
-
-mongoose.connect("mongodb://localhost:27017/recipe_db", {
-  useNewUrlParser: true,
-});
+//tells Mongoose to connect to the database defined in MONGODB_URI or default to the local recipe_db database location
+mongoose.connect(
+  process.env.MONGODB_URI || "mongodb://localhost:27017/recipe_db",
+  {
+    useNewUrlParser: true,
+  }
+);
 mongoose.set("useCreateIndex", true);
 
 const db = mongoose.connection;
@@ -79,6 +82,6 @@ app.use(expressValidator());
 //uses router object, which uses /routes/index.js
 app.use("/", router);
 
-app.listen(app.get("port"), () => {
+const server = app.listen(app.get("port"), () => {
   console.log(`Server running at http://localhost:${app.get("port")}`);
 });
