@@ -14,10 +14,13 @@ const express = require("express"),
 //
 //using Promises with Mongoose
 mongoose.Promise = global.Promise;
-//initiate connection
-mongoose.connect("mongodb://localhost:27017/confetti_cuisine", {
-  useNewUrlParser: true,
-});
+//initiate connection to MongoDB cloud or local
+mongoose.connect(
+  process.env.MONGODB_URI || "mongodb://localhost:27017/confetti_cuisine",
+  {
+    useNewUrlParser: true,
+  }
+);
 mongoose.set("useCreateIndex", true);
 //connect to db
 const db = mongoose.connection;
@@ -79,6 +82,6 @@ app.use(homeController.logRequestPaths);
 //handle all routes that starts with /
 app.use("/", router);
 
-app.listen(app.get("port"), () => {
+const server = app.listen(app.get("port"), () => {
   console.log(`Server is running on port ${app.get("port")}`);
 });
